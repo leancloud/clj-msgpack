@@ -5,3 +5,4 @@ classes
 *.dat
 .lein*
 target
+pom.xml.asc
