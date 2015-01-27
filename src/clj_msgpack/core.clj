@@ -1,5 +1,5 @@
 (ns clj-msgpack.core
-  (:require [clojure.java.io :as io]) 
+  (:require [clojure.java.io :as io])
   (:import (org.msgpack MessagePack)
            (org.msgpack.packer Packer)
            (org.msgpack.unpacker Unpacker)
@@ -24,7 +24,7 @@
   clojure.lang.Keyword
   (pack-me [kw ^Packer packer]
     (.write packer ^String (str \: (name kw)))) ; not round-trippable, but
-                                                ; better than nothing.
+                                        ; better than nothing.
 
   clojure.lang.Symbol
   (pack-me [sym ^Packer packer]
@@ -53,10 +53,10 @@
   (to-packer [obj]))
 
 (extend-protocol ToPacker
-  ;Convert an object into an org.msgpack.Packer instance.
+                                        ;Convert an object into an org.msgpack.Packer instance.
   Packer
   (to-packer [p] p)
-  
+
   Object
   (to-packer [obj]
     (let [mpacker (MessagePack.)]
@@ -85,9 +85,9 @@
 
 (defprotocol Unwrapable
   (unwrap [msgpack-obj]
-          "Unwrap one of the funky wrapper objects that msgpack uses."))
+    "Unwrap one of the funky wrapper objects that msgpack uses."))
 
-(def ^:dynamic *keywordize-strings* 
+(def ^:dynamic *keywordize-strings*
   "When true, unpack will convert strings that start with a colon into keywords."
   false)
 
@@ -124,4 +124,3 @@
   (let [is (io/input-stream from) ; hmmm, can't use with-open here...
         u (.createUnpacker (MessagePack.) is)]
     (map unwrap u)))
-

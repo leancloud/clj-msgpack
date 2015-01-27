@@ -1,9 +1,5 @@
-(defproject clj-msgpack "0.3.0"
-  :description "Messagepack serialization library for Clojure."
-  :dependencies [
-    [org.clojure/clojure "1.4.0"]
-    [org.msgpack/msgpack "0.6.6" :exclusions [junit]]
-    ]
-  :repositories {"msgpack" "http://msgpack.org/maven2/"}
-  :dev-dependnecies [[junit/junit "4.8.2"]]
-  )
+(defproject cn.leancloud/clj-msgpack "0.3.0-SNAPSHOT"
+  :description "Messagepack serialization library for Clojure. LeanCloud fork."
+  :dependencies [[org.clojure/clojure "1.6.0"]
+                 [org.msgpack/msgpack "0.6.11" :exclusions [junit]]]
+  :deploy-repositories {"releases" :clojars})
