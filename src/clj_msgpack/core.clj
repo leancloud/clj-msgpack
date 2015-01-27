@@ -23,8 +23,7 @@
 
   clojure.lang.Keyword
   (pack-me [kw ^Packer packer]
-    (.write packer ^String (str \: (name kw)))) ; not round-trippable, but
-                                        ; better than nothing.
+    (.write packer ^String (name kw)))
 
   clojure.lang.Symbol
   (pack-me [sym ^Packer packer]
@@ -84,43 +83,38 @@
 ;;; Unpacking
 
 (defprotocol Unwrapable
-  (unwrap [msgpack-obj]
+  (unwrap [msgpack-obj key-fn]
     "Unwrap one of the funky wrapper objects that msgpack uses."))
-
-(def ^:dynamic *keywordize-strings*
-  "When true, unpack will convert strings that start with a colon into keywords."
-  false)
 
 (extend-protocol Unwrapable
   ;; Specialized unwraps
   BigIntegerValueImpl
-  (unwrap [o] (.getBigInteger o))
+  (unwrap [o _] (.getBigInteger o))
   DoubleValueImpl
-  (unwrap [o] (.getDouble o))
+  (unwrap [o _] (.getDouble o))
   FloatValueImpl
-  (unwrap [o] (.getFloat o))
+  (unwrap [o _] (.getFloat o))
   LongValueImpl
-  (unwrap [o] (.getLong o))
+  (unwrap [o _] (.getLong o))
 
   ;; Non-specialized
   IntegerValue
-  (unwrap [o] (.getInt o))
+  (unwrap [o _] (.getInt o))
   ArrayValue
-  (unwrap [o] (into [] (map unwrap (.getElementArray o))))
+  (unwrap [o key-fn] (into [] (map #(unwrap % key-fn) (.getElementArray o))))
   BooleanValue
-  (unwrap [o] (.getBoolean o))
+  (unwrap [o _] (.getBoolean o))
   MapValue
-  (unwrap [o] (into {} (map (fn [[k v]] [(unwrap k) (unwrap v)]) o)))
+  (unwrap [o key-fn] (into {} (map (fn [[k v]] [(unwrap k key-fn) (unwrap v key-fn)]) o)))
   NilValue
-  (unwrap [o] nil)
+  (unwrap [o _] nil)
   RawValue
-  (unwrap [o]
+  (unwrap [o key-fn]
     (let [v (.getString o)]
-      (if (and *keywordize-strings* (.startsWith v ":"))
-        (keyword (.substring v 1))
-        v))))
+      (key-fn v))))
 
-(defn unpack [from]
+(defn unpack [from & {:keys [key-fn]
+                      :or {key-fn identity}}]
   (let [is (io/input-stream from) ; hmmm, can't use with-open here...
         u (.createUnpacker (MessagePack.) is)]
-    (map unwrap u)))
+    (map #(unwrap % key-fn) u)))

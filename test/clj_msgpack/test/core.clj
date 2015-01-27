@@ -42,10 +42,16 @@
     (is (= obj (round-trip obj)))))
 
 (deftest test-round-trip-keyword-default
-  (is (= ":foo" (round-trip :foo))))
+  (is (= "foo" (round-trip :foo))))
 
-(deftest test-round-trip-keyword-with-keywordization
-  (is (= :foo (binding [*keywordize-strings* true] (round-trip :foo)))))
+(defn- round-trip-keyword-key-fn [obj]
+  (let [ba (pack obj)]
+    (-> ba (unpack :key-fn keyword) first)))
+
+(deftest test-key-fn
+  (doseq [v [{:key :value}
+             [1 2 {:key [{:v 123} {:t nil}]}]]]
+    (is (= v (round-trip-keyword-key-fn v)))))
 
 (deftest test-pack-to-file
   (let [data-in [{"yo" "dawg" 147 [true false]} "kldjfld" "kdajfkd" 37447]]
