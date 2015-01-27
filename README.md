@@ -1,11 +1,13 @@
 # clj-msgpack #
 
 This is a Clojure wrapper for the [MessagePack](http://msgpack.org/)
-library. And this is the fork from LeanCloud.
+library. And this is the fork from [LeanCloud](https://leancloud.cn/).
 
 It allows you serialize and deserialize simple clojure objects to and
 from  a well-defined binary format that is portable to many other
 programming languages.
+
+[![Build Status](https://travis-ci.org/leancloud/clj-msgpack.svg)](https://travis-ci.org/leancloud/clj-msgpack)
 
 ## Leiningen
 
