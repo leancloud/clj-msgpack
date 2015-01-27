@@ -1,11 +1,15 @@
 # clj-msgpack #
 
 This is a Clojure wrapper for the [MessagePack](http://msgpack.org/)
-library.
+library. And this is the fork from LeanCloud.
 
 It allows you serialize and deserialize simple clojure objects to and
 from  a well-defined binary format that is portable to many other
 programming languages.
+
+## Leiningen
+
+[![Clojars Project](http://clojars.org/cn.leancloud/clj-msgpack/latest-version.svg)](http://clojars.org/cn.leancloud/clj-msgpack)
 
 ## Example ##
 
@@ -13,12 +17,12 @@ Put some objects in a file:
 
     (require '[clj-msgpack.core :as mp])
     (use '[clojure.java.io :only [output-stream]])
-    
+
     (def data [nil true false {"yo" "dawg"} ["foo" "bar"]])
     (with-open [f (output-stream "./temp.dat")]
       (mp/pack-into f "Hello" 23)
       (apply mp/pack-into f data))
-    
+
 
 Pull them back out somewhere else (eg: ruby):
 
@@ -33,7 +37,9 @@ Pull them back out somewhere else (eg: ruby):
       false
       {"yo"=>"dawg"}
       ["foo", "bar"]
-    
+
+Need keyword for object keys? Use `:key-fn keyword` with `unpack`,
+just like in data.json.
 
 ## Why? ##
 
@@ -44,4 +50,3 @@ you are serializing a lot of numbers. For stringy data, it's probably
 not much smaller than JSON. At some point I'll do some benchmarks to
 see how small and/or fast this is compared to some of the
 alternatives.
-
