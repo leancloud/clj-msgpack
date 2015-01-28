@@ -83,38 +83,38 @@
 ;;; Unpacking
 
 (defprotocol Unwrapable
-  (unwrap [msgpack-obj key-fn]
+  (unwrap [msgpack-obj key-fn key?]
     "Unwrap one of the funky wrapper objects that msgpack uses."))
 
 (extend-protocol Unwrapable
   ;; Specialized unwraps
   BigIntegerValueImpl
-  (unwrap [o _] (.getBigInteger o))
+  (unwrap [o _ _] (.getBigInteger o))
   DoubleValueImpl
-  (unwrap [o _] (.getDouble o))
+  (unwrap [o _ _] (.getDouble o))
   FloatValueImpl
-  (unwrap [o _] (.getFloat o))
+  (unwrap [o _ _] (.getFloat o))
   LongValueImpl
-  (unwrap [o _] (.getLong o))
+  (unwrap [o _ _] (.getLong o))
 
   ;; Non-specialized
   IntegerValue
-  (unwrap [o _] (.getInt o))
+  (unwrap [o _ _] (.getInt o))
   ArrayValue
-  (unwrap [o key-fn] (into [] (map #(unwrap % key-fn) (.getElementArray o))))
+  (unwrap [o key-fn key?] (into [] (map #(unwrap % key-fn key?) (.getElementArray o))))
   BooleanValue
-  (unwrap [o _] (.getBoolean o))
+  (unwrap [o _ _] (.getBoolean o))
   MapValue
-  (unwrap [o key-fn] (into {} (map (fn [[k v]] [(unwrap k key-fn) (unwrap v key-fn)]) o)))
+  (unwrap [o key-fn _] (into {} (map (fn [[k v]] [(unwrap k key-fn true) (unwrap v key-fn false)]) o)))
   NilValue
-  (unwrap [o _] nil)
+  (unwrap [o _ _] nil)
   RawValue
-  (unwrap [o key-fn]
+  (unwrap [o key-fn key?]
     (let [v (.getString o)]
-      (key-fn v))))
+      (if key? (key-fn v) v))))
 
 (defn unpack [from & {:keys [key-fn]
                       :or {key-fn identity}}]
   (let [is (io/input-stream from) ; hmmm, can't use with-open here...
         u (.createUnpacker (MessagePack.) is)]
-    (map #(unwrap % key-fn) u)))
+    (map #(unwrap % key-fn false) u)))

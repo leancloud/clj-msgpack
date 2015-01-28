@@ -49,7 +49,7 @@
     (-> ba (unpack :key-fn keyword) first)))
 
 (deftest test-key-fn
-  (doseq [v [{:key :value}
+  (doseq [v [{:key "value"}
              [1 2 {:key [{:v 123} {:t nil}]}]]]
     (is (= v (round-trip-keyword-key-fn v)))))
 
