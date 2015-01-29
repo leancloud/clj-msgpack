@@ -1,4 +1,4 @@
-(defproject cn.leancloud/clj-msgpack "0.4.2-SNAPSHOT"
+(defproject cn.leancloud/clj-msgpack "0.5.0-SNAPSHOT"
   :url "https://github.com/leancloud/clj-msgpack"
   :license {:name "MIT"}
   :description "Messagepack serialization library for Clojure. LeanCloud fork."
