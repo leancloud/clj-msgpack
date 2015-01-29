@@ -1,4 +1,4 @@
-(ns clj-msgpack.test.core
+(ns clj-msgpack.core-test
   (:use [clj-msgpack.core] :reload)
   (:use [clojure.test])
   (:use [clojure.java.io :only [input-stream output-stream]]))
