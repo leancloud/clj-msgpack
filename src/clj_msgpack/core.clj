@@ -1,11 +1,12 @@
 (ns clj-msgpack.core
   (:require [clojure.java.io :as io])
   (:import [java.io ByteArrayOutputStream]
+           [java.nio ByteBuffer]
            [org.msgpack.core MessagePack
             MessagePacker MessageUnpacker]
            [org.msgpack.value ArrayValue BooleanValue MapValue MapCursor
             RawValue Value FloatValue IntegerValue NilValue NumberValue
-            ArrayCursor]
+            ArrayCursor BinaryValue]
            [org.msgpack.value.impl BigIntegerValueImpl
             IntegerValueImpl LongValueImpl DoubleValueImpl FloatValueImpl]))
 
@@ -90,7 +91,18 @@
 
   java.math.BigInteger
   (pack-me [m ^MessagePacker packer]
-    (.packBigInteger packer m)))
+    (.packBigInteger packer m))
+
+  java.nio.ByteBuffer
+  (pack-me [m ^MessagePacker packer]
+    (.packBinaryHeader packer (.remaining m))
+    (.writePayload packer m)))
+
+(extend (Class/forName "[B")
+  Packable
+  {:pack-me (fn [m ^MessagePacker packer]
+              (.packBinaryHeader packer (alength m))
+              (.writePayload packer m))})
 
 (defprotocol ToPacker
   (to-packer [obj]))
@@ -164,7 +176,10 @@
   RawValue
   (unwrap [o key-fn key?]
     (let [v (.toString o)]
-      (if key? (key-fn v) v))))
+      (if key? (key-fn v) v)))
+  BinaryValue
+  (unwrap [o _ _]
+    (.toByteArray o)))
 
 (defn unpack [from & {:keys [key-fn]
                       :or {key-fn identity}}]

@@ -59,3 +59,8 @@
       (apply pack-into f data-in))
     (let [data-out (unpack "./temp.dat")]
       (is (= data-in data-out)))))
+
+(deftest test-byte-array-round-trip
+  (let [data [32 33 34 35]
+        bytes (byte-array data)]
+    (is (= (into [] (first (unpack (pack bytes)))) data))))
